@@ -3,16 +3,21 @@ class BaseClass
         @player = {}
     end
     def nPlayerSet(player)
-        # @player[player['name']].store 'name',player['name']
-        # @player[player['mana']].store 'mana',player['mana']
-        # @player[player['blood']].store 'blood',player['blood']
         @player.store(player["name"], player)
     end
     def updateStatus(player)
-        @player.each do |val,key|
-            if @player[key]['name'] == player['name']
+        @player.each do |key,val|
+            if @player[key]['name'] == val['name']
                 @player[key]['mana'] = player['mana']
-                @player[key]['blood'] = player['blood']
+                @player[key]['blood'] = val['blood']
+            end
+        end
+    end
+    def refreshPlayers(player)
+        @player.each do |key,val|
+            if @player[key]['name'] == val['name']
+                @player[key]['mana'] = 40
+                @player[key]['blood'] = 100
             end
         end
     end
@@ -49,6 +54,15 @@ class BaseClass
             return input
         end
     end
+    def demageAttack(pName)
+        @player[pName]['mana'] = @player[pName]['mana'] - 5
+        @player[pName]['mana'] < 0 ? @player[pName]['mana'] = 0 : @player[pName]['mana']
+        return {"basic"=>20,"crit"=>rand(0..10),"miss"=>rand(0..1)}
+    end
+    def decreaseBlood(pName,blood)
+        @player[pName]['blood'] = @player[pName]['blood'] - blood
+        @player[pName]['blood'] < 0 ? @player[pName]['blood'] = 0 : @player[pName]['blood']
+    end
     def survivePlayer()
         count = 0
         @player.each_value do |val|
@@ -59,7 +73,7 @@ class BaseClass
         return count
     end
     def winnerPlayer()
-        @player.each do |val|
+        @player.each_value do |val|
             if (val['mana'] > 0) && ( val['blood'] > 0 )
                 return val['name']
             end
@@ -140,9 +154,9 @@ class BaseClass
         puts "Attack log :\n"
         puts " Basic Demage : #{info['basic']} \n"
         puts " Miss  Demage : #{info['miss']} \n"
-        puts " Crit  Demage : #{((info['crit']/info['basic'])*100)} % \n"
+        puts " Crit  Demage : #{(info['crit']*100)/info['basic']} % \n"
         puts "-------------------------------------\n"
-        puts "Press any button to continue \n"
+        print "Press any button to continue"
         gets.chomp
     end
 end
@@ -177,15 +191,5 @@ class Player
     end  
     def getPlayerStat()
         return {"name"=>@name,"mana"=>@mana,"blood"=>@blood}
-    end
-    def decreaseBlood(blood)
-        @blood = @blood - blood
-        if @blood < 0
-            @blood = 0
-        end
-    end
-    def demageAttack(name)
-        @player
-        return ["basic"=>20,"crit"=>rand(0..10),"miss"=>rand(0..1)]
     end
 end
